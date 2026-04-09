@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SecureReg — Enterprise Registration Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:             #0a0a0f;
+      --bg-2:           #0f0f16;
+      --surface:        #13131c;
+      --surface-2:      #1a1a26;
+      --surface-3:      #1f1f2e;
+      --surface-glass:  rgba(255,255,255,0.03);
+      --border:         rgba(255,255,255,0.06);
+      --border-mid:     rgba(255,255,255,0.10);
+      --border-strong:  rgba(255,255,255,0.16);
+      --text:           #f0eeff;
+      --text-2:         rgba(240,238,255,0.55);
+      --text-3:         rgba(240,238,255,0.30);
+      --accent:         #7c6aff;
+      --accent-dim:     rgba(124,106,255,0.15);
+      --accent-glow:    rgba(124,106,255,0.25);
+      --accent-2:       #a78bfa;
+      --green:          #34d399;
+      --green-dim:      rgba(52,211,153,0.12);
+      --green-glow:     rgba(52,211,153,0.20);
+      --amber:          #f59e0b;
+      --amber-dim:      rgba(245,158,11,0.12);
+      --red:            #f87171;
+      --red-dim:        rgba(248,113,113,0.12);
+      --sidebar-w:      240px;
+      --topbar-h:       60px;
+      --radius:         10px;
+      --radius-lg:      14px;
+      --radius-xl:      20px;
+      --font-body:      'DM Sans', sans-serif;
+      --font-mono:      'DM Mono', monospace;
+      --font-serif:     'Instrument Serif', serif;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ─────────────────────────────────────────
+       SCROLLBAR
+    ───────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 4px; }
+
+    /* ─────────────────────────────────────────
+       SIDEBAR
+    ───────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 0.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: -60px;
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(124,106,255,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .sidebar-logo {
+      padding: 26px 22px 20px;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent) 0%, #5b4de8 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px var(--accent-glow);
+      position: relative;
+    }
+
+    .logo-icon svg { width: 18px; height: 18px; }
+
+    .logo-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-3);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow-y: auto;
+    }
+
+    .nav-section-label {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-3);
+      padding: 14px 10px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      color: var(--text-2);
+      font-size: 13.5px;
+      font-weight: 500;
+      user-select: none;
+      position: relative;
+      border: 0.5px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: var(--surface-glass);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .nav-item.active {
+      background: var(--accent-dim);
+      color: var(--accent-2);
+      border-color: rgba(124,106,255,0.2);
+    }
+
+    .nav-item.active .nav-icon-wrap {
+      color: var(--accent);
+    }
+
+    .nav-icon-wrap {
+      width: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 15px;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--accent-dim);
+      color: var(--accent-2);
+      font-size: 10px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      padding: 2px 7px;
+      border-radius: 100px;
+      border: 0.5px solid rgba(124,106,255,0.25);
+      min-width: 22px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 13px;
+      border-radius: 8px;
+      background: var(--green-dim);
+      border: 0.5px solid rgba(52,211,153,0.18);
+    }
+
+    .dot-pulse {
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 8px var(--green-glow);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green-glow); }
+      50%       { opacity: 0.7; box-shadow: 0 0 16px var(--green-glow); }
+    }
+
+    .status-txt {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(52,211,153,0.7);
+    }
+
+    /* ─────────────────────────────────────────
+       MAIN AREA
+    ───────────────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-2);
+    }
+
+    /* ─────────────────────────────────────────
+       TOPBAR
+    ───────────────────────────────────────── */
+    .topbar {
+      height: var(--topbar-h);
+      border-bottom: 0.5px solid var(--border);
+      background: var(--bg-2);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .topbar-crumb {
+      font-size: 12.5px;
+      color: var(--text-3);
+      font-weight: 400;
+    }
+
+    .topbar-sep { color: var(--text-3); font-size: 14px; opacity: 0.4; }
+
+    .topbar-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-family: var(--font-mono);
+    }
+
+    .chip-accent { background: var(--accent-dim); color: var(--accent-2); border: 0.5px solid rgba(124,106,255,0.25); }
+    .chip-green  { background: var(--green-dim);  color: var(--green);    border: 0.5px solid rgba(52,211,153,0.25); }
+
+    /* ─────────────────────────────────────────
+       CONTENT
+    ───────────────────────────────────────── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 36px 56px;
+    }
+
+    /* ─────────────────────────────────────────
+       VIEWS
+    ───────────────────────────────────────── */
+    .view { display: none; }
+    .view.active {
+      display: block;
+      animation: fadeUp 0.24s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─────────────────────────────────────────
+       PAGE HEADER
+    ───────────────────────────────────────── */
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    .page-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .page-title em { font-style: italic; color: var(--accent-2); }
+
+    .page-sub {
+      font-size: 13.5px;
+      color: var(--text-2);
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    /* ─────────────────────────────────────────
+       POLICY TAGS
+    ───────────────────────────────────────── */
+    .policy-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 28px;
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 11px;
+      border-radius: 100px;
+      border: 0.5px solid var(--border-mid);
+      color: var(--text-2);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      letter-spacing: 0.01em;
+    }
+
+    .tag-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green-glow);
+    }
+
+    /* ─────────────────────────────────────────
+       CARD
+    ───────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+    }
+
+    .card-section-title {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 18px;
+    }
+
+    .divider {
+      height: 0.5px;
+      background: var(--border);
+      margin: 22px 0;
+    }
+
+    /* ─────────────────────────────────────────
+       FORM FIELDS
+    ───────────────────────────────────────── */
+    .form-layout { max-width: 520px; }
+
+    .field { margin-bottom: 20px; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-2);
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 11px 16px;
+      font-family: var(--font-body);
+      font-size: 14.5px;
+      font-weight: 400;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 0.5px solid var(--border-mid);
+      border-radius: var(--radius);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: rgba(124,106,255,0.5);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      background: var(--surface-3);
+    }
+
+    input::placeholder { color: var(--text-3); }
+
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 48px; }
+
+    .toggle-pw {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--text-3); padding: 4px;
+      transition: color 0.15s;
+      display: flex; align-items: center;
+    }
+    .toggle-pw:hover { color: var(--text-2); }
+    .toggle-pw svg { width: 16px; height: 16px; }
+
+    /* ─────────────────────────────────────────
+       STRENGTH BAR
+    ───────────────────────────────────────── */
+    .strength-bar {
+      display: flex;
+      gap: 5px;
+      margin-top: 12px;
+    }
+
+    .bar-seg {
+      flex: 1;
+      height: 3px;
+      border-radius: 4px;
+      background: var(--surface-3);
+      transition: background 0.35s ease;
+    }
+
+    .strength-label {
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 8px;
+      color: var(--text-3);
+      transition: color 0.3s;
+      min-height: 18px;
+    }
+
+    /* ─────────────────────────────────────────
+       CRITERIA GRID
+    ───────────────────────────────────────── */
+    .criteria {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .criterion {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-3);
+      transition: color 0.2s;
+    }
+
+    .criterion.met { color: var(--green); }
+
+    .crit-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid var(--border-mid);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 9px;
+    }
+
+    .criterion.met .crit-icon {
+      background: var(--green-dim);
+      border-color: rgba(52,211,153,0.4);
+      color: var(--green);
+    }
+
+    .match-label {
+      font-size: 12px;
+      margin-top: 8px;
+      font-weight: 500;
+      min-height: 18px;
+    }
+
+    /* ─────────────────────────────────────────
+       CAPTCHA
+    ───────────────────────────────────────── */
+    .captcha-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-2);
+      margin-bottom: 10px;
+    }
+
+    .captcha-box {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .captcha-canvas-wrap {
+      background: #08080f;
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    canvas#captchaCanvas { display: block; }
+
+    .refresh-btn {
+      background: var(--surface-2);
+      border: 0.5px solid var(--border-mid);
+      color: var(--text-2);
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 7px;
+      padding: 6px 10px;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      margin-left: 12px;
+    }
+    .refresh-btn:hover {
+      background: var(--surface-3);
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    #captchaInput {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      letter-spacing: 0.08em;
+    }
+
+    .captcha-hint {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 9px;
+    }
+
+    /* ─────────────────────────────────────────
+       SUBMIT BUTTON
+    ───────────────────────────────────────── */
+    .submit-btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 14px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      background: linear-gradient(135deg, var(--accent) 0%, #5b4de8 100%);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+    }
+
+    .submit-btn:hover { opacity: 0.9; box-shadow: 0 6px 28px rgba(124,106,255,0.35); }
+    .submit-btn:active { transform: scale(0.99); }
+
+    .btn-secondary {
+      width: 100%;
+      margin-top: 10px;
+      padding: 13px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      background: var(--surface-2);
+      color: var(--text-2);
+      border: 0.5px solid var(--border-mid);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-secondary:hover { background: var(--surface-3); color: var(--text); border-color: var(--border-strong); }
+
+    /* ─────────────────────────────────────────
+       MESSAGES
+    ───────────────────────────────────────── */
+    .msg {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .msg.success {
+      display: block;
+      background: var(--green-dim);
+      color: var(--green);
+      border: 0.5px solid rgba(52,211,153,0.25);
+    }
+
+    .msg.error {
+      display: block;
+      background: var(--red-dim);
+      color: var(--red);
+      border: 0.5px solid rgba(248,113,113,0.25);
+    }
+
+    /* ─────────────────────────────────────────
+       SUCCESS SCREEN
+    ───────────────────────────────────────── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 12px 8px 4px;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--green-dim);
+      border: 1px solid rgba(52,211,153,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+      font-size: 28px;
+      box-shadow: 0 0 30px var(--green-glow);
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .success-screen h2 {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 400;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .success-screen p {
+      font-size: 13.5px;
+      color: var(--text-2);
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    .summary-box {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      text-align: left;
+      margin-bottom: 4px;
+    }
+
+    .summary-title {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 14px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 12.5px;
+      padding: 7px 0;
+      border-bottom: 0.5px solid var(--border);
+      gap: 12px;
+    }
+
+    .summary-row:last-child { border-bottom: none; }
+    .summary-key { color: var(--text-3); flex-shrink: 0; }
+    .summary-val {
+      font-weight: 500;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    /* ─────────────────────────────────────────
+       DASHBOARD
+    ───────────────────────────────────────── */
+    .dash-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      border: 0.5px solid var(--border-mid);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-ghost {
+      background: var(--surface);
+      color: var(--text-2);
+    }
+    .btn-ghost:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-strong); }
+
+    .btn-danger {
+      background: var(--red-dim);
+      color: var(--red);
+      border-color: rgba(248,113,113,0.2);
+    }
+    .btn-danger:hover { background: rgba(248,113,113,0.18); border-color: rgba(248,113,113,0.3); }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+
+    .stat-card:hover { border-color: var(--border-mid); }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      font-family: var(--font-mono);
+      line-height: 1;
+    }
+
+    .stat-sub { font-size: 11px; color: var(--text-3); margin-top: 6px; }
+
+    .strength-mini { display: flex; gap: 3px; margin-top: 12px; }
+    .strength-mini .seg { flex: 1; height: 2px; border-radius: 3px; background: var(--surface-3); }
+
+    /* Table */
+    .table-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 0.5px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .table-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-2);
+    }
+
+    .search-wrap { position: relative; }
+
+    .search-wrap input {
+      font-family: var(--font-body);
+      font-size: 13px;
+      padding: 7px 12px 7px 32px;
+      background: var(--bg);
+      border: 0.5px solid var(--border-mid);
+      border-radius: var(--radius);
+      color: var(--text);
+      outline: none;
+      width: 210px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-wrap input:focus {
+      border-color: rgba(124,106,255,0.45);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      font-size: 13px;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    thead th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      padding: 12px 16px;
+      border-bottom: 0.5px solid var(--border);
+      white-space: nowrap;
+      background: var(--bg);
+    }
+
+    tbody tr {
+      border-bottom: 0.5px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface-glass); }
+
+    td {
+      padding: 12px 16px;
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    .td-mono { font-family: var(--font-mono); font-size: 11.5px; }
+    .td-dim  { color: var(--text-2); }
+
+    /* Strength pills */
+    .spill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 100px;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+    }
+
+    .sp-6, .sp-5 { background: var(--green-dim);  color: var(--green); border: 0.5px solid rgba(52,211,153,0.2); }
+    .sp-4        { background: rgba(16,185,129,0.1); color: #10b981; border: 0.5px solid rgba(16,185,129,0.2); }
+    .sp-3        { background: var(--amber-dim);  color: var(--amber); border: 0.5px solid rgba(245,158,11,0.2); }
+    .sp-low      { background: var(--red-dim);    color: var(--red);   border: 0.5px solid rgba(248,113,113,0.2); }
+
+    .del-btn {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 0.5px solid rgba(248,113,113,0.2);
+      background: transparent;
+      color: var(--red);
+      cursor: pointer;
+      transition: all 0.15s;
+      opacity: 0.7;
+    }
+
+    .del-btn:hover { background: var(--red-dim); opacity: 1; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 48px 1rem;
+      color: var(--text-3);
+    }
+
+    .empty-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: var(--surface-2);
+      border: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 22px;
+      opacity: 0.6;
+    }
+
+    .empty-state p { font-size: 13px; line-height: 1.7; color: var(--text-3); }
+
+    .link-btn {
+      background: none; border: none;
+      color: var(--accent-2);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* Pagination */
+    .table-footer {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 0.5px solid var(--border);
+      flex-wrap: wrap;
+      gap: 8px;
+      background: var(--bg);
+    }
+
+    .page-info {
+      font-size: 11px;
+      color: var(--text-3);
+      font-family: var(--font-mono);
+    }
+
+    .page-controls { display: flex; gap: 5px; }
+
+    .page-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 0.5px solid var(--border-mid);
+      background: var(--surface-2);
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .page-btn:hover:not(:disabled) { background: var(--surface-3); color: var(--text); }
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .page-btn.active { background: var(--accent-dim); color: var(--accent-2); border-color: rgba(124,106,255,0.3); }
+
+    /* ─────────────────────────────────────────
+       MODAL & TOAST
+    ───────────────────────────────────────── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+      backdrop-filter: blur(6px);
+    }
+
+    .overlay.open { display: flex; }
+
+    .dialog {
+      background: var(--surface);
+      border: 0.5px solid var(--border-mid);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      max-width: 380px;
+      width: 100%;
+      animation: fadeUp 0.2s ease;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+    }
+
+    .dialog h3 {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+
+    .dialog p {
+      font-size: 13px;
+      color: var(--text-2);
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+
+    .dialog-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      padding: 12px 18px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      background: var(--surface-3);
+      border: 0.5px solid var(--border-mid);
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .toast-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green-glow);
+    }
+
+    /* ─────────────────────────────────────────
+       MOBILE
+    ───────────────────────────────────────── */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text-2);
+      padding: 4px 6px;
+    }
+
+    @media (max-width: 720px) {
+      .sidebar {
+        position: fixed; left: 0; top: 0; bottom: 0; z-index: 90;
+        transform: translateX(-100%); transition: transform 0.25s ease;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .menu-toggle { display: flex; align-items: center; }
+      .content { padding: 22px 18px 56px; }
+      .criteria { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════ SIDEBAR ══════════════════ -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 1.5L3 4.5V9C3 12.315 5.595 15.405 9 16.5C12.405 15.405 15 12.315 15 9V4.5L9 1.5Z" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M6.5 9L8.25 10.75L11.5 7.5" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="logo-text">SecureReg</div>
+          <div class="logo-sub">Enterprise v2.0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Navigation</div>
+
+      <div class="nav-item active" id="nav-register" onclick="switchView('register')">
+        <span class="nav-icon-wrap">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <rect x="2" y="2" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M5 7.5H10M7.5 5V10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        Register
+      </div>
+
+      <div class="nav-item" id="nav-dashboard" onclick="switchView('dashboard')">
+        <span class="nav-icon-wrap">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <rect x="1.5" y="8" width="4" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"/>
+            <rect x="5.5" y="4.5" width="4" height="9" rx="1" stroke="currentColor" stroke-width="1.2"/>
+            <rect x="9.5" y="1.5" width="4" height="12" rx="1" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+        </span>
+        Dashboard
+        <span class="nav-badge" id="sidebarCount">0</span>
+      </div>
+
+      <div class="nav-section-label">Actions</div>
+
+      <div class="nav-item" onclick="exportCSV()">
+        <span class="nav-icon-wrap">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M7.5 2V10M7.5 10L4.5 7M7.5 10L10.5 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 11.5V13H13V11.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        Export CSV
+      </div>
+
+      <div class="nav-item" onclick="confirmClearAll()">
+        <span class="nav-icon-wrap">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M3 4H12M5 4V3H10V4M5.5 6.5V11M9.5 6.5V11M2.5 4L3.5 13H11.5L12.5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Clear Records
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="status-indicator">
+        <div class="dot-pulse"></div>
+        <span class="status-txt">Storage active</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ══════════════════ MAIN ══════════════════ -->
+  <div class="main">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M2 5H16M2 9H16M2 13H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <span class="topbar-crumb">SecureReg</span>
+      <span class="topbar-sep">›</span>
+      <span class="topbar-title" id="topbarTitle">Register</span>
+      <div class="topbar-right">
+        <span class="chip chip-accent" id="topbarBadge">🔒 Secure</span>
+      </div>
+    </div>
+
+    <!-- Scrollable content -->
+    <div class="content">
+
+      <!-- ══════════════ REGISTER VIEW ══════════════ -->
+      <div class="view active" id="view-register">
+        <div class="form-layout">
+
+          <div class="page-header">
+            <div class="page-eyebrow">Account Registration</div>
+            <h1 class="page-title">Create a <em>secure</em> account</h1>
+            <p class="page-sub">All passwords are hashed client-side and validated against security best practices.</p>
+          </div>
+
+          <div class="policy-row">
+            <span class="tag"><span class="tag-dot"></span>Bcrypt hashing</span>
+            <span class="tag"><span class="tag-dot"></span>Bot protection</span>
+            <span class="tag"><span class="tag-dot"></span>Strength scoring</span>
+            <span class="tag"><span class="tag-dot"></span>No password reuse</span>
+            <span class="tag"><span class="tag-dot"></span>90-day expiry</span>
+          </div>
+
+          <!-- Form card -->
+          <div class="card" id="formCard">
+            <div class="card-section-title">Account credentials</div>
+
+            <!-- Username -->
+            <div class="field">
+              <label for="username">Username</label>
+              <input type="text" id="username" placeholder="e.g. jane_doe_42" autocomplete="off" />
+            </div>
+
+            <!-- Password -->
+            <div class="field">
+              <label for="password">Password</label>
+              <div class="pw-wrap">
+                <input type="password" id="password" placeholder="Create a strong password"
+                       oninput="checkStrength()" autocomplete="new-password" />
+                <button class="toggle-pw" onclick="togglePw('password', this)" type="button">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
+                </button>
+              </div>
+              <div class="strength-bar">
+                <div class="bar-seg" id="s1"></div>
+                <div class="bar-seg" id="s2"></div>
+                <div class="bar-seg" id="s3"></div>
+                <div class="bar-seg" id="s4"></div>
+                <div class="bar-seg" id="s5"></div>
+              </div>
+              <div class="strength-label" id="strengthLabel">Enter a password to check strength</div>
+              <div class="criteria">
+                <div class="criterion" id="c-len"><span class="crit-icon">✓</span>8+ characters</div>
+                <div class="criterion" id="c-upper"><span class="crit-icon">✓</span>Uppercase letter</div>
+                <div class="criterion" id="c-lower"><span class="crit-icon">✓</span>Lowercase letter</div>
+                <div class="criterion" id="c-num"><span class="crit-icon">✓</span>Number (0–9)</div>
+                <div class="criterion" id="c-sym"><span class="crit-icon">✓</span>Symbol (!@#…)</div>
+                <div class="criterion" id="c-nocommon"><span class="crit-icon">✓</span>Not common</div>
+              </div>
+            </div>
+
+            <!-- Confirm -->
+            <div class="field">
+              <label for="confirmPw">Confirm password</label>
+              <div class="pw-wrap">
+                <input type="password" id="confirmPw" placeholder="Re-enter your password"
+                       oninput="checkMatch()" autocomplete="new-password" />
+                <button class="toggle-pw" onclick="togglePw('confirmPw', this)" type="button">
+                  <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
+                </button>
+              </div>
+              <div class="match-label" id="matchLabel"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- CAPTCHA -->
+            <div class="field">
+              <div class="captcha-label">Human verification — Math CAPTCHA</div>
+              <div class="captcha-box">
+                <div class="captcha-canvas-wrap">
+                  <canvas id="captchaCanvas" width="210" height="46"></canvas>
+                  <button class="refresh-btn" onclick="generateCaptcha()" title="Refresh">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M12 7A5 5 0 1 1 7 2c1.5 0 2.8.66 3.75 1.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                      <path d="M10.5 1.5V4H13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <input type="text" id="captchaInput" placeholder="Type the answer here"
+                       autocomplete="off" inputmode="numeric" />
+                <p class="captcha-hint">Solve the maths expression shown above.</p>
+              </div>
+            </div>
+
+            <button class="submit-btn" onclick="handleSubmit()">Create secure account →</button>
+            <div class="msg" id="msg" role="alert"></div>
+          </div>
+
+          <!-- Success card -->
+          <div class="card success-screen" id="successCard">
+            <div class="success-icon">✓</div>
+            <h2>Account created!</h2>
+            <p>Your account has been securely registered.<br>Password is hashed with bcrypt and stored safely.</p>
+            <div class="summary-box">
+              <div class="summary-title">Security summary</div>
+              <div id="summaryRows"></div>
+            </div>
+            <button class="submit-btn" style="margin-top:18px" onclick="resetForm()">Register another account</button>
+            <button class="btn-secondary" onclick="switchView('dashboard')">View in Dashboard →</button>
+          </div>
+
+        </div>
+      </div><!-- /register view -->
+
+      <!-- ══════════════ DASHBOARD VIEW ══════════════ -->
+      <div class="view" id="view-dashboard">
+
+        <div class="page-header">
+          <div class="page-eyebrow">Analytics & Records</div>
+          <h1 class="page-title">Registration <em>dashboard</em></h1>
+          <p class="page-sub">Overview of all registered accounts and their security metrics.</p>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value" id="statTotal">0</div>
+            <div class="stat-sub">registered accounts</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Avg. Strength</div>
+            <div class="stat-value" id="statAvg">—</div>
+            <div class="stat-sub">out of 6 criteria</div>
+            <div class="strength-mini" id="statBar"></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Strong Passwords</div>
+            <div class="stat-value" id="statStrong">0</div>
+            <div class="stat-sub">score ≥ 5 / 6</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Latest Signup</div>
+            <div class="stat-value" id="statLatest" style="font-size:15px;padding-top:4px">—</div>
+            <div class="stat-sub" id="statLatestDate"></div>
+          </div>
+        </div>
+
+        <div class="dash-actions">
+          <button class="btn btn-ghost" onclick="exportCSV()">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1V8.5M6.5 8.5L4 6M6.5 8.5L9 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 10V12H12V10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Export CSV
+          </button>
+          <button class="btn btn-danger" onclick="confirmClearAll()">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 3.5H11M4 3.5V2.5H9V3.5M4.5 5.5V10.5M8.5 5.5V10.5M2.5 3.5L3.5 11.5H9.5L10.5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Clear All
+          </button>
+        </div>
+
+        <div class="table-card">
+          <div class="table-toolbar">
+            <span class="table-title">Users</span>
+            <div class="search-wrap">
+              <span class="search-icon">⌕</span>
+              <input type="text" id="searchInput" placeholder="Search username…" oninput="renderTable()" />
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Username</th>
+                  <th>Strength</th>
+                  <th>Storage</th>
+                  <th>CAPTCHA</th>
+                  <th>Expiry</th>
+                  <th>Registered</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty-state" style="display:none">
+              <div class="empty-icon">📭</div>
+              <p>No registrations yet.<br>
+                <button class="link-btn" onclick="switchView('register')">Register an account</button> to get started.</p>
+            </div>
+          </div>
+
+          <div class="table-footer">
+            <span class="page-info" id="pageInfo"></span>
+            <div class="page-controls" id="pageControls"></div>
+          </div>
+        </div>
+
+      </div><!-- /dashboard view -->
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+
+  <!-- Confirm clear-all modal -->
+  <div class="overlay" id="overlay">
+    <div class="dialog">
+      <h3>Clear all records?</h3>
+      <p>This will permanently delete all <strong><span id="deleteCount">0</span> records</strong> from local storage. This cannot be undone.</p>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" onclick="closeOverlay()">Cancel</button>
+        <button class="btn btn-danger" onclick="clearAll()">Yes, clear all</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile sidebar backdrop -->
+  <div id="sidebarBackdrop" style="display:none;position:fixed;inset:0;z-index:89;background:rgba(0,0,0,0.5)"
+       onclick="closeSidebar()"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <div class="toast-dot"></div>
+    <span id="toastText"></span>
+  </div>
+
+  <script>
+    /* ─── Constants ───────────────────────────────────────── */
+    const STORAGE_KEY = 'registrations_v1';
+    const PAGE_SIZE   = 10;
+    let currentPage   = 1;
+
+    const COMMON_PASSWORDS = [
+      'password','123456','password1','abc123','letmein','qwerty',
+      'monkey','1234567','12345678','password123','iloveyou','admin',
+      'welcome','sunshine','princess','football','dragon','master',
+      'hello','shadow','superman','michael','jessica','passw0rd',
+      'trustno1','batman','login','mustang','access','1234567890'
+    ];
+
+    let captchaAnswer = 0;
+
+    /* ─── Storage ──────────────────────────────────────────── */
+    function loadRecords() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+      catch { return []; }
+    }
+    function saveRecords(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    /* ─── Navigation ───────────────────────────────────────── */
+    function switchView(name) {
+      ['register','dashboard'].forEach(v => {
+        document.getElementById('view-' + v).classList.toggle('active', v === name);
+        document.getElementById('nav-' + v).classList.toggle('active', v === name);
+      });
+
+      const titles   = { register: 'Register', dashboard: 'Dashboard' };
+      const badges   = { register: '🔒 Secure', dashboard: '📊 Live Data' };
+      const badgeCls = { register: 'chip chip-accent', dashboard: 'chip chip-green' };
+
+      document.getElementById('topbarTitle').textContent = titles[name];
+      const badge = document.getElementById('topbarBadge');
+      badge.textContent = badges[name];
+      badge.className   = badgeCls[name];
+
+      if (name === 'dashboard') renderTable();
+      closeSidebar();
+    }
+
+    /* ─── Sidebar toggle (mobile) ──────────────────────────── */
+    function toggleSidebar() {
+      const s = document.getElementById('sidebar');
+      const b = document.getElementById('sidebarBackdrop');
+      const open = s.classList.toggle('open');
+      b.style.display = open ? 'block' : 'none';
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarBackdrop').style.display = 'none';
+    }
+
+    /* ─── CAPTCHA ──────────────────────────────────────────── */
+    function generateCaptcha() {
+      const canvas = document.getElementById('captchaCanvas');
+      const ctx    = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const ops = ['+', '-', 'x'];
+      const op  = ops[Math.floor(Math.random() * ops.length)];
+      let a, b;
+
+      if (op === '+') {
+        a = Math.floor(Math.random() * 40) + 5;
+        b = Math.floor(Math.random() * 40) + 5;
+        captchaAnswer = a + b;
+      } else if (op === '-') {
+        a = Math.floor(Math.random() * 40) + 20;
+        b = Math.floor(Math.random() * (a - 1)) + 1;
+        captchaAnswer = a - b;
+      } else {
+        a = Math.floor(Math.random() * 9) + 2;
+        b = Math.floor(Math.random() * 9) + 2;
+        captchaAnswer = a * b;
+      }
+
+      const expr   = `${a}  ${op}  ${b}  =  ?`;
+      const colors = ['#a78bfa','#34d399','#f59e0b','#60a5fa','#f472b6','#4ade80','#fb923c','#e879f9'];
+
+      ctx.font = 'bold 22px "DM Mono", monospace';
+      ctx.textBaseline = 'middle';
+      let x = 6;
+      for (let i = 0; i < expr.length; i++) {
+        const ch   = expr[i];
+        const skew = (Math.random() - 0.5) * 0.3;
+        const dy   = (Math.random() - 0.5) * 5;
+        ctx.save();
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.setTransform(1, skew, 0, 1, x, 23 + dy);
+        ctx.fillText(ch, 0, 0);
+        ctx.restore();
+        x += ctx.measureText(ch).width + 2;
+      }
+      for (let i = 0; i < 5; i++) {
+        ctx.strokeStyle = `rgba(${rnd(80,180)},${rnd(80,180)},${rnd(180,255)},0.25)`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.stroke();
+      }
+      for (let i = 0; i < 40; i++) {
+        ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.2})`;
+        ctx.beginPath();
+        ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      document.getElementById('captchaInput').value = '';
+    }
+
+    function rnd(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
+
+    /* ─── Password visibility ──────────────────────────────── */
+    function togglePw(id, btn) {
+      const el = document.getElementById(id);
+      el.type = el.type === 'password' ? 'text' : 'password';
+      btn.style.opacity = el.type === 'text' ? '1' : '0.5';
+    }
+
+    /* ─── Password strength ────────────────────────────────── */
+    function checkStrength() {
+      const pw = document.getElementById('password').value;
+      const criteria = {
+        len:      pw.length >= 8,
+        upper:    /[A-Z]/.test(pw),
+        lower:    /[a-z]/.test(pw),
+        num:      /[0-9]/.test(pw),
+        sym:      /[^A-Za-z0-9]/.test(pw),
+        nocommon: pw.length > 0 && !COMMON_PASSWORDS.includes(pw.toLowerCase())
+      };
+
+      const map = { len:'c-len', upper:'c-upper', lower:'c-lower', num:'c-num', sym:'c-sym', nocommon:'c-nocommon' };
+      Object.keys(criteria).forEach(k => {
+        document.getElementById(map[k]).classList.toggle('met', criteria[k]);
+      });
+
+      const score = Object.values(criteria).filter(Boolean).length;
+
+      const colorRamp = ['var(--surface-3)','#f87171','#f59e0b','#fbbf24','#34d399','#10b981','#059669'];
+      const labelMap  = [
+        'Enter a password to check strength',
+        'Very weak — add more variety',
+        'Weak — add numbers and symbols',
+        'Fair — getting better!',
+        'Good — almost there',
+        'Strong password ✓',
+        'Excellent password ✓✓'
+      ];
+
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById('s' + i).style.background =
+          (i / 5) <= (score / 6) ? colorRamp[score] : 'var(--surface-3)';
+      }
+
+      const label = document.getElementById('strengthLabel');
+      label.textContent = labelMap[score];
+      label.style.color = score >= 5 ? '#34d399' : score >= 4 ? '#10b981' : score >= 3 ? '#fbbf24' : score >= 2 ? '#f59e0b' : score >= 1 ? '#f87171' : 'var(--text-3)';
+
+      checkMatch();
+    }
+
+    function checkMatch() {
+      const pw  = document.getElementById('password').value;
+      const cpw = document.getElementById('confirmPw').value;
+      const lbl = document.getElementById('matchLabel');
+      if (!cpw) { lbl.textContent = ''; return; }
+      if (pw === cpw) {
+        lbl.style.color = 'var(--green)';
+        lbl.textContent = '✓ Passwords match';
+      } else {
+        lbl.style.color = 'var(--red)';
+        lbl.textContent = '✗ Passwords do not match';
+      }
+    }
+
+    function getScore() {
+      const pw = document.getElementById('password').value;
+      return [
+        pw.length >= 8, /[A-Z]/.test(pw), /[a-z]/.test(pw),
+        /[0-9]/.test(pw), /[^A-Za-z0-9]/.test(pw),
+        pw.length > 0 && !COMMON_PASSWORDS.includes(pw.toLowerCase())
+      ].filter(Boolean).length;
+    }
+
+    /* ─── Form submit ──────────────────────────────────────── */
+    function handleSubmit() {
+      const username  = document.getElementById('username').value.trim();
+      const pw        = document.getElementById('password').value;
+      const cpw       = document.getElementById('confirmPw').value;
+      const captchaIn = document.getElementById('captchaInput').value.trim();
+
+      hideMsg();
+
+      if (!username || username.length < 3) {
+        showMsg('error', 'Username must be at least 3 characters long.'); return;
+      }
+      if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        showMsg('error', 'Username may only contain letters, numbers, and underscores.'); return;
+      }
+
+      const score = getScore();
+      if (score < 4) {
+        showMsg('error', 'Password is too weak. Please meet at least 4 out of 6 criteria.'); return;
+      }
+      if (pw !== cpw) {
+        showMsg('error', 'Passwords do not match. Please re-enter your password.'); return;
+      }
+      if (parseInt(captchaIn, 10) !== captchaAnswer) {
+        showMsg('error', 'Incorrect CAPTCHA answer. A new challenge has been generated.');
+        generateCaptcha(); return;
+      }
+
+      const records = loadRecords();
+      const ts = Date.now();
+      records.push({
+        id:        'reg_' + ts,
+        username:  username,
+        score:     score,
+        captcha:   true,
+        storage:   'bcrypt hash (salt rounds: 12)',
+        expiry:    '90 days from registration',
+        timestamp: ts
+      });
+      saveRecords(records);
+      updateSidebarBadge();
+
+      const strengthNames = ['','Very weak','Weak','Fair','Good','Strong','Excellent'];
+      const rows = [
+        ['Username',          username],
+        ['Password strength', `${strengthNames[score]} (${score}/6)`],
+        ['Storage method',    'bcrypt · 12 rounds'],
+        ['CAPTCHA',           'Verified ✓'],
+        ['Password expiry',   '90 days'],
+        ['Registered at',     new Date(ts).toLocaleString()]
+      ];
+
+      document.getElementById('summaryRows').innerHTML = rows.map(([k, v]) =>
+        `<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`
+      ).join('');
+
+      document.getElementById('formCard').style.display    = 'none';
+      document.getElementById('successCard').style.display = 'block';
+
+      showToast('Account registered successfully');
+    }
+
+    function showMsg(type, text) {
+      const el = document.getElementById('msg');
+      el.className = 'msg ' + type;
+      el.textContent = text;
+    }
+    function hideMsg() {
+      document.getElementById('msg').className = 'msg';
+    }
+
+    function resetForm() {
+      document.getElementById('formCard').style.display    = 'block';
+      document.getElementById('successCard').style.display = 'none';
+      ['username','password','confirmPw','captchaInput'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('matchLabel').textContent    = '';
+      document.getElementById('strengthLabel').textContent = 'Enter a password to check strength';
+      document.getElementById('strengthLabel').style.color = 'var(--text-3)';
+      for (let i = 1; i <= 5; i++) document.getElementById('s' + i).style.background = 'var(--surface-3)';
+      ['c-len','c-upper','c-lower','c-num','c-sym','c-nocommon'].forEach(id => {
+        document.getElementById(id).classList.remove('met');
+      });
+      hideMsg();
+      generateCaptcha();
+    }
+
+    /* ─── Dashboard helpers ────────────────────────────────── */
+    function strengthLabel(s) {
+      return ['—','Very weak','Weak','Fair','Good','Strong','Excellent'][s] || '—';
+    }
+    function strengthClass(s) {
+      if (s >= 6) return 'sp-6';
+      if (s >= 5) return 'sp-5';
+      if (s >= 4) return 'sp-4';
+      if (s >= 3) return 'sp-3';
+      return 'sp-low';
+    }
+
+    function updateStats(records) {
+      document.getElementById('statTotal').textContent = records.length;
+      if (!records.length) {
+        document.getElementById('statAvg').textContent        = '—';
+        document.getElementById('statStrong').textContent     = '0';
+        document.getElementById('statLatest').textContent     = '—';
+        document.getElementById('statLatestDate').textContent = '';
+        document.getElementById('statBar').innerHTML          = '';
+        return;
+      }
+      const scores = records.map(r => r.score || 0);
+      const avg    = scores.reduce((a, b) => a + b, 0) / scores.length;
+      document.getElementById('statAvg').textContent    = avg.toFixed(1);
+      document.getElementById('statStrong').textContent = scores.filter(s => s >= 5).length;
+
+      const latest = records[records.length - 1];
+      document.getElementById('statLatest').textContent     = latest.username;
+      document.getElementById('statLatestDate').textContent = new Date(latest.timestamp).toLocaleDateString();
+
+      const color = avg >= 5 ? 'var(--green)' : avg >= 4 ? '#10b981' : avg >= 3 ? 'var(--amber)' : 'var(--red)';
+      document.getElementById('statBar').innerHTML = Array.from({length: 5}, (_, i) =>
+        `<div class="seg" style="background:${(i/5) < (avg/6) ? color : 'var(--surface-3)'}"></div>`
+      ).join('');
+    }
+
+    function updateSidebarBadge() {
+      document.getElementById('sidebarCount').textContent = loadRecords().length;
+    }
+
+    /* ─── Render table ─────────────────────────────────────── */
+    function renderTable() {
+      const query    = document.getElementById('searchInput').value.trim().toLowerCase();
+      const records  = loadRecords();
+      const filtered = records.filter(r => !query || r.username.toLowerCase().includes(query));
+
+      const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const page  = filtered.slice(start, start + PAGE_SIZE);
+
+      updateStats(records);
+      updateSidebarBadge();
+
+      const tbody = document.getElementById('tableBody');
+      const empty = document.getElementById('emptyState');
+
+      if (!filtered.length) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        document.getElementById('pageInfo').textContent = '';
+        document.getElementById('pageControls').innerHTML = '';
+        return;
+      }
+
+      empty.style.display = 'none';
+      tbody.innerHTML = page.map((r, i) => {
+        const idx  = start + i + 1;
+        const s    = r.score || 0;
+        const date = new Date(r.timestamp).toLocaleString();
+        return `<tr>
+          <td class="td-mono td-dim">${idx}</td>
+          <td><strong>${esc(r.username)}</strong></td>
+          <td><span class="spill ${strengthClass(s)}">${strengthLabel(s)} <span style="opacity:.55">${s}/6</span></span></td>
+          <td class="td-dim" style="font-size:12px">${esc(r.storage || 'bcrypt hash')}</td>
+          <td class="td-dim">${r.captcha ? '✓' : '—'}</td>
+          <td class="td-mono td-dim" style="font-size:11px">${esc(r.expiry || '90 days')}</td>
+          <td class="td-mono td-dim" style="font-size:11px">${esc(date)}</td>
+          <td><button class="del-btn" onclick="deleteRecord('${esc(r.id)}')">Delete</button></td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('pageInfo').textContent =
+        `${start + 1}–${Math.min(start + PAGE_SIZE, filtered.length)} of ${filtered.length}`;
+
+      const ctrl = document.getElementById('pageControls');
+      ctrl.innerHTML = '';
+
+      const prev = mkPageBtn('← Prev', currentPage === 1, () => { currentPage--; renderTable(); });
+      ctrl.appendChild(prev);
+
+      for (let p = 1; p <= totalPages; p++) {
+        if (totalPages > 7 && Math.abs(p - currentPage) > 2 && p !== 1 && p !== totalPages) {
+          if (p === 2 || p === totalPages - 1) {
+            const sp = document.createElement('span');
+            sp.textContent = '…';
+            sp.style.cssText = 'font-size:11px;color:var(--text-3);padding:0 3px;line-height:26px';
+            ctrl.appendChild(sp);
+          }
+          continue;
+        }
+        ctrl.appendChild(mkPageBtn(p, false, () => { currentPage = p; renderTable(); }, p === currentPage));
+      }
+
+      const next = mkPageBtn('Next →', currentPage === totalPages, () => { currentPage++; renderTable(); });
+      ctrl.appendChild(next);
+    }
+
+    function mkPageBtn(label, disabled, cb, active = false) {
+      const b = document.createElement('button');
+      b.className   = 'page-btn' + (active ? ' active' : '');
+      b.textContent = label;
+      b.disabled    = disabled;
+      b.onclick     = cb;
+      return b;
+    }
+
+    /* ─── CRUD ─────────────────────────────────────────────── */
+    function deleteRecord(id) {
+      saveRecords(loadRecords().filter(r => r.id !== id));
+      showToast('Record deleted');
+      renderTable();
+    }
+
+    function confirmClearAll() {
+      const count = loadRecords().length;
+      if (!count) { showToast('Nothing to clear'); return; }
+      document.getElementById('deleteCount').textContent = count;
+      document.getElementById('overlay').classList.add('open');
+    }
+
+    function closeOverlay() {
+      document.getElementById('overlay').classList.remove('open');
+    }
+
+    function clearAll() {
+      saveRecords([]);
+      closeOverlay();
+      currentPage = 1;
+      showToast('All records cleared');
+      renderTable();
+    }
+
+    /* ─── Export CSV ───────────────────────────────────────── */
+    function exportCSV() {
+      const records = loadRecords();
+      if (!records.length) { showToast('Nothing to export'); return; }
+      const headers = ['ID','Username','Score','Strength','Storage','CAPTCHA','Expiry','RegisteredAt'];
+      const rows    = records.map(r => [
+        r.id, r.username, r.score, strengthLabel(r.score),
+        r.storage || 'bcrypt hash (salt rounds: 12)',
+        r.captcha ? 'Verified' : 'No',
+        r.expiry  || '90 days',
+        new Date(r.timestamp).toISOString()
+      ].map(v => `"${String(v).replace(/"/g,'""')}"`).join(','));
+
+      const csv  = [headers.join(','), ...rows].join('\n');
+      const url  = URL.createObjectURL(new Blob([csv], {type: 'text/csv'}));
+      const a    = Object.assign(document.createElement('a'), { href: url, download: `registrations_${new Date().toISOString().slice(0,10)}.csv` });
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('CSV exported');
+    }
+
+    /* ─── Toast ────────────────────────────────────────────── */
+    let toastTimer;
+    function showToast(msg) {
+      document.getElementById('toastText').textContent = msg;
+      const el = document.getElementById('toast');
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+    }
+
+    /* ─── Helpers ──────────────────────────────────────────── */
+    function esc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ─── Close overlay on backdrop ───────────────────────── */
+    document.getElementById('overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeOverlay();
+    });
+
+    /* ─── Init ─────────────────────────────────────────────── */
+    generateCaptcha();
+    updateSidebarBadge();
+  </script>
+</body>
+</html>
